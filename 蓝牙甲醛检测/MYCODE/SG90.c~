@@ -1,0 +1,77 @@
+//	PE9		FSMC_D6 	TIM1_CH1
+
+#include "SG90.h"
+
+void sg90_Init(void)
+{
+	GPIO_InitTypeDef 			GPIO_InitStructure;
+	
+	//使能GPIOE
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE, ENABLE);
+	
+	//配置引脚 
+	GPIO_InitStructure.GPIO_Pin 	= GPIO_Pin_7; //引脚9
+	GPIO_InitStructure.GPIO_Mode 	= GPIO_Mode_OUT;  	//复用模式
+	GPIO_InitStructure.GPIO_Speed 	= GPIO_Speed_25MHz;
+	GPIO_InitStructure.GPIO_OType 	= GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd 	= GPIO_PuPd_UP ;
+	GPIO_Init(GPIOE, &GPIO_InitStructure); 
+	PEout(7) = 0;
+ 
+
+}
+
+void sg90_up(int sum) 
+{
+	if(sum==0)
+	{
+		PEout(7)=1;
+		delay_us(500);
+		
+		PEout(7)=0;
+		delay_us(500);
+		delay_ms(19);
+	}
+
+	if(sum==45)
+	{
+		PEout(7)=1;
+		delay_ms(1);
+		
+		PEout(7)=0;
+		delay_ms(19);
+	}
+
+
+	if(sum==90)
+	{
+		PEout(7)=1;
+		delay_ms(1);
+		delay_us(500);
+		
+		PEout(7)=0;
+		delay_ms(18);
+		delay_us(500);
+	}
+	
+	if(sum==135)
+	{
+		PEout(7)=1;
+		delay_ms(2);
+		
+		PEout(7)=0;
+		delay_ms(18);
+	}	
+	
+	if(sum==180)
+	{
+		PEout(7)=1;
+		delay_ms(2);
+		delay_us(500);
+		
+		PEout(7)=0;
+		delay_ms(17);
+		delay_us(500);
+	}		
+}
+ 

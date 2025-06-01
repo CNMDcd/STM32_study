@@ -1,0 +1,220 @@
+/*************************
+班级：电子信息工程211
+作者： 文龙					所属院校：贵州黔南科技学院
+电话： 18885484220			邮箱:2597443135@qq.com
+
+当前页面：主函数(main.c)
+*************************/
+
+#include "stm32f4xx.h"
+#include "pwm.h"
+#include "bluetooth.h"
+#include "printf.h"
+#include "hcsr04.h"
+#include "delay.h"
+#include "led.h"
+#include "dht11.h"
+#include "tim3.h"
+
+/*************************
+// LCD 显示屏
+
+// 甲醛检测
+	串口 USART2	 B9600
+	GPIOD_Pin_5 发送请求
+	GPIOD_Pin_6 接收返回数据
+
+// 温湿度检测		完成
+	GPIOE_Pin_1
+
+// 点灯测试			完成
+	GPIOA_Pin_6 
+	
+// 超声波测距		完成
+	GPIOB_Pin_8 发送请求
+	GPIOB_Pin_9 接收返回数据
+
+// 蓝牙				完成
+	串口 USART1	B9600
+		GPIOA_Pin_9 GPIOA_Pin_10;
+
+// 电机驱动控制  	完成
+	鼓风机 区别正负，反向无效 
+		//PA0 PA1
+		TIM_SetCompare1(TIM5, 0);
+		TIM_SetCompare2(TIM5, 0); 
+	电机(风扇) 不区别正负，反向则进行反方向旋转
+		//PA2 PA3
+		TIM_SetCompare3(TIM5, 0); 
+		TIM_SetCompare4(TIM5, 0); 
+		
+*************************/
+
+
+u8 g_data;					// 超声波测距数据
+
+u8 g_cbuffer[36] = {0}; 
+u8 g_crbuffer[36] = {0};
+
+/***  蓝牙(bluetooth)  ***/
+u8 g_flag = 0;  			// 判定是否接收完数据
+u8 g_buffer[32] = {0};    	// 接收数据
+u8 g_rxbuffer[32] = {0};  	// 读取数据
+u8 rx_i;					// 判定变量
+u8 g_count = 0; 			// 接收数据长度
+
+void USART1_IRQHandler(void)
+{ 
+	if(USART_GetITStatus(USART1, USART_IT_RXNE) == SET)
+	{
+		USART_ClearITPendingBit(USART1, USART_IT_RXNE); 
+		
+		g_buffer[g_count++] = USART_ReceiveData(USART1); 
+		
+		if(g_buffer[g_count - 1] == ':')
+		{ 
+			for(rx_i=0; rx_i < g_count - 1; rx_i++)
+			{ 
+				g_rxbuffer[rx_i] = g_buffer[rx_i];
+			}
+			 
+			memset(g_buffer, 0, sizeof(g_buffer));
+			
+			g_flag = 1; 
+			 
+			g_count = 0;
+	
+		} 
+	}	 
+}
+
+void USART2_IRQHandler(void)
+{ 
+	g_flag = -2;
+	if(USART_GetITStatus(USART2, USART_IT_RXNE) == SET)
+	{
+		USART_ClearITPendingBit(USART2, USART_IT_RXNE); 
+		g_flag = -1;
+		
+		g_cbuffer[g_count++] = USART_ReceiveData(USART2); 
+		
+		 if(!(g_cbuffer[0] == 0xFF))
+         {
+              g_count = 0;
+			  g_flag = 1; 
+			  g_cbuffer[0]=0;               
+         }
+		
+		if(g_count == 8)
+		{ 	
+			for(rx_i=0; rx_i < g_count - 1; rx_i++)
+			{ 
+				g_crbuffer[rx_i] = g_cbuffer[rx_i];
+			}
+			 
+			memset(g_cbuffer, 0, sizeof(g_cbuffer));
+			//printf("甲醛：%s",g_rxbuffer);
+			g_flag = 2; 
+			g_count = 0;
+		} 
+	}	 
+}
+
+
+int main(void)
+{
+	Pwm_Init();
+	Bluetooth_Init();
+	Hcsr04_Init();
+	Led_Init();
+	Tim3_Cnt_Init();
+	Dht11_Init(); 
+	
+	
+	
+	//printf("g_rxbuffer:%s\r\n", g_rxbuffer); 
+	while(1)
+	{  
+//		if(g_flag == 1)
+//		{ 
+//			if(strcmp(g_rxbuffer, "start") == 0)
+//			{	// 手动开启 鼓风机和风扇
+//				TIM_SetCompare1(TIM5, 999); 
+//				TIM_SetCompare3(TIM5, 999);  
+//			}
+//			if(strcmp(g_rxbuffer, "stop") == 0)
+//			{
+//				// 手动停止 鼓风机和风扇
+//				TIM_SetCompare1(TIM5, 0); 
+//				TIM_SetCompare3(TIM5, 0);  
+//			}
+//			if(strcmp(g_rxbuffer, "hcsr") == 0)
+//			{
+//				// 手动开启 单次测距
+//				g_data = Get_Hcsr04_Value();
+//				delay_ms(500);
+//				if(g_data != 0)
+//				{
+//					printf("Distance: %d CM\r\n", g_data); 
+//				}
+//				else
+//				{
+//					printf("Distance：ERROR\r\n"); 
+//				}	 
+//			}
+//			if(strcmp(g_rxbuffer, "ledo") == 0)
+//			{
+//				// 手动验证程序是否运行正常
+//				delay_ms(20);
+//				GPIO_ToggleBits(GPIOA,GPIO_Pin_6); 
+//			}
+//			if(strcmp(g_rxbuffer, "dht11") == 0)
+//			{
+//				// 手动获取温湿度
+//				u8 Dht11_Tmp[5];
+//				int ret = Dht11_Date(Dht11_Tmp);
+//				if(ret == 0)//*********************
+//				{
+//					printf("温度:%d.%d℃,湿度:%d.%d\r\n", Dht11_Tmp[2],Dht11_Tmp[3], Dht11_Tmp[0], Dht11_Tmp[1]);
+//				} 
+//				else
+//				{
+//					printf("温湿度获取:失败\r\n");
+//				}
+//				delay_s(2);  
+//			}
+//			if(strcmp(g_rxbuffer, "ch2o") == 0)
+//			{ 
+//				printf("甲醛1：%s-",g_crbuffer);
+//				u8 Dht11_Tmp[5];
+//				int ret = Dht11_Date(Dht11_Tmp); 
+//				u16 tm = 0xFF01784000000000;
+//				USART_SendData(USART2,tm);    
+//				while(USART_GetFlagStatus(USART2,USART_FLAG_TXE)!=RESET);  
+//				printf("甲醛2：%s-",g_crbuffer);
+//				delay_s(2);  
+//				memset(g_crbuffer,0,sizeof(g_crbuffer));
+//			}
+//			
+//			g_flag = 0;
+//			memset(g_rxbuffer,0,sizeof(g_rxbuffer));
+//		}
+		printf("甲醛2：%s(%d)-",g_crbuffer,g_flag);
+		if(g_flag == 2)
+		{ 
+			u8 pm25Value = g_crbuffer[4]*256 + g_crbuffer[5]; 
+			u8 result = pm25Value / 66.64 * 0.08;
+		  
+			printf("甲醛：%d-",result);
+		}
+		delay_s(1);
+
+
+
+
+
+
+
+	}
+    return 0;
+ }

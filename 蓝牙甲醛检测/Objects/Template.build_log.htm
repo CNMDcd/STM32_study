@@ -1,0 +1,174 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: ¦ÌVision V5.28.0.0
+Copyright (C) 2019 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: aaa WenLong, aaa, LIC=8VRJ7-E7G1Z-JJS6S-LCBBP-URX7R-GVXXR
+ 
+Tool Versions:
+Toolchain:       MDK-ARM Plus  Version: 5.28.0.0
+Toolchain Path:  E:\MDK528\core\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 update 6 (build 750)
+Assembler:       Armasm.exe V5.06 update 6 (build 750)
+Linker/Locator:  ArmLink.exe V5.06 update 6 (build 750)
+Library Manager: ArmAr.exe V5.06 update 6 (build 750)
+Hex Converter:   FromElf.exe V5.06 update 6 (build 750)
+CPU DLL:         SARMCM3.DLL V5.28.0.0
+Dialog DLL:      DCM.DLL V1.17.3.0
+Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V3.0.6.0
+Dialog DLL:      TCM.DLL V1.36.2.0
+ 
+<h2>Project:</h2>
+E:\MDK528\Source\CH2Ostmf407\Template.uvprojx
+Project File Date:  04/09/2025
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.06 update 6 (build 750)', folder: 'E:\MDK528\core\ARM\ARMCC\Bin'
+Build target 'Target 1'
+compiling main.c...
+MYCODE\pwm.h(17): warning:  #1-D: last line of file ends without a newline
+  #endif
+MYCODE\printf.h(17): warning:  #1-D: last line of file ends without a newline
+  #endif
+MYCODE\led.h(17): warning:  #1-D: last line of file ends without a newline
+  #endif
+MYCODE\dht11.h(24): warning:  #1-D: last line of file ends without a newline
+  #endif
+MYCODE\ch2o.h(16): warning:  #1295-D: Deprecated declaration CheckSum - give arg types
+  u8 CheckSum();
+MYCODE\ch2o.h(17): warning:  #1295-D: Deprecated declaration ch2oInit - give arg types
+  float ch2oInit();
+MYCODE\ch2o.h(18): warning:  #1295-D: Deprecated declaration co2Init - give arg types
+  int co2Init();
+MYCODE\ch2o.h(19): warning:  #1295-D: Deprecated declaration tvocInit - give arg types
+  float tvocInit();
+MYCODE\iic.h(29): warning:  #1-D: last line of file ends without a newline
+  #endif
+MYCODE\beep.h(16): warning:  #1-D: last line of file ends without a newline
+  #endif
+MYCODE\main.c(106): warning:  #223-D: function "memset" declared implicitly
+  			memset(g_buffer, 0, sizeof(g_buffer));
+MYCODE\main.c(175): warning:  #167-D: argument of type "char *" is incompatible with parameter of type "unsigned char *"
+  		OLED_ShowStr(32, 0, ch2o2, 1); 
+MYCODE\main.c(181): warning:  #167-D: argument of type "char *" is incompatible with parameter of type "unsigned char *"
+  		OLED_ShowStr(32, 1, tvoc2, 1); 
+MYCODE\main.c(187): warning:  #167-D: argument of type "char *" is incompatible with parameter of type "unsigned char *"
+  		OLED_ShowStr(32, 2, co22, 1); 
+MYCODE\main.c(202): warning:  #167-D: argument of type "char *" is incompatible with parameter of type "unsigned char *"
+  			OLED_ShowStr(2, 5, cs, 1); 
+MYCODE\main.c(203): warning:  #167-D: argument of type "char *" is incompatible with parameter of type "unsigned char *"
+  			OLED_ShowStr(2, 6, cs1, 1); 
+MYCODE\main.c(218): warning:  #1035-D: single-precision operand implicitly converted to double-precision
+  			if(ch2o >= 0.1)
+MYCODE\main.c(236): warning:  #223-D: function "strcmp" declared implicitly
+  			if(strcmp(g_rxbuffer, "start") == 0)
+MYCODE\main.c(241): warning:  #223-D: function "strcmp" declared implicitly
+  			if(strcmp(g_rxbuffer, "stop") == 0)
+MYCODE\main.c(247): warning:  #223-D: function "strcmp" declared implicitly
+  			if(strcmp(g_rxbuffer, "hcsr") == 0)
+MYCODE\main.c(261): warning:  #223-D: function "strcmp" declared implicitly
+  			if(strcmp(g_rxbuffer, "ledo") == 0)
+MYCODE\main.c(268): warning:  #223-D: function "strcmp" declared implicitly
+  			if(strcmp(g_rxbuffer, "dht11") == 0)
+MYCODE\main.c(281): warning:  #223-D: function "strcmp" declared implicitly
+  			if(strcmp(g_rxbuffer, "ch2o") == 0)
+MYCODE\main.c(288): warning:  #223-D: function "strcmp" declared implicitly
+  			if(strcmp(g_rxbuffer, "beep") == 0)
+MYCODE\main.c(294): warning:  #223-D: function "strcmp" declared implicitly
+  			if(strcmp(g_rxbuffer, "zidong") == 0)
+MYCODE\main.c(298): warning:  #223-D: function "strcmp" declared implicitly
+  			if(strcmp(g_rxbuffer,"shoudong") == 0)
+MYCODE\main.c(303): warning:  #223-D: function "memset" declared implicitly
+  			memset(g_rxbuffer,0,sizeof(g_rxbuffer));
+MYCODE\main.c(309): warning:  #111-D: statement is unreachable
+      return 0;
+MYCODE\main.c: 28 warnings, 0 errors
+linking...
+Program Size: Code=13570 RO-data=2674 RW-data=80 ZI-data=1720  
+".\Objects\Template.axf" - 0 Error(s), 28 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: ARM
+                http://www.keil.com/pack/ARM.CMSIS.5.5.1.pack
+                ARM.CMSIS.5.5.1
+                CMSIS (Cortex Microcontroller Software Interface Standard)
+   * Component: CORE Version: 5.2.0
+
+Package Vendor: Keil
+                http://www.keil.com/pack/Keil.STM32F4xx_DFP.1.0.8.pack
+                Keil.STM32F4xx_DFP.1.0.8
+                STMicroelectronics STM32F4 Series Device Support, Drivers and Examples
+   * Component: Startup Version: 1.3.1
+   * Component: EXTI Version: 1.3.0
+   * Component: Framework Version: 1.3.1
+   * Component: GPIO Version: 1.3.0
+   * Component: PWR Version: 1.3.0
+   * Component: RCC Version: 1.3.0
+   * Component: RTC Version: 1.3.0
+   * Component: SYSCFG Version: 1.3.0
+   * Component: TIM Version: 1.3.0
+   * Component: USART Version: 1.3.0
+
+<h2>Collection of Component include folders:</h2>
+  .\RTE\Device\STM32F407ZE
+  .\RTE\_Target_1
+  E:\MDK528\pack\ARM\CMSIS\5.5.1\CMSIS\Core\Include
+  E:\MDK528\pack\Keil\STM32F4xx_DFP\1.0.8\Device\Include
+  E:\MDK528\pack\Keil\STM32F4xx_DFP\1.0.8\Device\StdPeriph_Driver\inc
+
+<h2>Collection of Component Files used:</h2>
+
+   * Component: ARM::CMSIS:CORE:5.2.0
+
+   * Component: Keil::Device:Startup:1.3.1
+      Source file:   Device\Source\ARM\startup_stm32f40_41xxx.s
+      Include file:  RTE_Driver\Config\RTE_Device.h
+      Source file:   Device\Source\ARM\STM32F4xx_OTP.s
+      Source file:   Device\Source\system_stm32f4xx.c
+      Include file:  Device\Include\stm32f4xx.h
+      Source file:   Device\Source\ARM\STM32F40xxx_41xxx_OPT.s
+
+   * Component: Keil::Device:StdPeriph Drivers:EXTI:1.3.0
+      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_exti.c
+      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_exti.h
+
+   * Component: Keil::Device:StdPeriph Drivers:Framework:1.3.1
+      Source file:   Device\StdPeriph_Driver\templates\stm32f4xx_conf.h
+      Source file:   Device\StdPeriph_Driver\src\misc.c
+      Source file:   Device\StdPeriph_Driver\templates\stm32f4xx_it.c
+      Include file:  Device\StdPeriph_Driver\templates\stm32f4xx_it.h
+
+   * Component: Keil::Device:StdPeriph Drivers:GPIO:1.3.0
+      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_gpio.c
+      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_gpio.h
+
+   * Component: Keil::Device:StdPeriph Drivers:PWR:1.3.0
+      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_pwr.h
+      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_pwr.c
+
+   * Component: Keil::Device:StdPeriph Drivers:RCC:1.3.0
+      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_rcc.h
+      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_rcc.c
+
+   * Component: Keil::Device:StdPeriph Drivers:RTC:1.3.0
+      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_rtc.h
+      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_rtc.c
+
+   * Component: Keil::Device:StdPeriph Drivers:SYSCFG:1.3.0
+      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_syscfg.c
+      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_syscfg.h
+
+   * Component: Keil::Device:StdPeriph Drivers:TIM:1.3.0
+      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_tim.h
+      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_tim.c
+
+   * Component: Keil::Device:StdPeriph Drivers:USART:1.3.0
+      Include file:  Device\StdPeriph_Driver\inc\stm32f4xx_usart.h
+      Source file:   Device\StdPeriph_Driver\src\stm32f4xx_usart.c
+Build Time Elapsed:  00:00:01
+</pre>
+</body>
+</html>

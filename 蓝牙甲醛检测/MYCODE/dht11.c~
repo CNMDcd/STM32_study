@@ -1,0 +1,207 @@
+/*************************
+班级：电子信息工程211
+作者： 文龙					所属院校：贵州黔南科技学院
+电话： 18885484220			邮箱:2597443135@qq.com
+
+当前页面：温湿度检测  头文件(dht11.h)
+*************************/
+#include "dht11.h"
+#include "OLED_I2C.h"
+
+/*** 
+温湿度模块：Dht11
+	GPIOB_Pin_1 -- DQ(DHT11)
+***/
+
+
+void Dht11_Init(void)
+{
+	GPIO_InitTypeDef  	GPIO_InitStructure;
+	
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOB, ENABLE);
+	
+	
+	GPIO_InitStructure.GPIO_Pin 	= GPIO_Pin_0;				//第9号引脚
+	GPIO_InitStructure.GPIO_Mode 	= GPIO_Mode_OUT;			//输出模式
+	GPIO_InitStructure.GPIO_OType 	= GPIO_OType_PP;			//推挽输出，增强驱动能力，引脚的输出电流更大
+	GPIO_InitStructure.GPIO_Speed 	= GPIO_Speed_25MHz;			//引脚的速度最大为25MHz
+	GPIO_InitStructure.GPIO_PuPd 	= GPIO_PuPd_NOPULL;			//没有使用内部上拉电阻
+	GPIO_Init(GPIOB, &GPIO_InitStructure);	
+	
+	//温湿度模块还没有工作，那么它的触发引脚是高电平
+	GPIO_ResetBits(GPIOE,GPIO_Pin_0);
+}
+
+//引脚模式变更
+void Dht11_Pin_Mode(GPIOMode_TypeDef mode)
+{
+	GPIO_InitTypeDef  	GPIO_InitStructure;
+	
+	GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_0;				//第9号引脚
+	GPIO_InitStructure.GPIO_Mode  = mode;					//输入/输出模式
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;			//推挽输出，增强驱动能力，引脚的输出电流更大
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;		//引脚的速度最大为100MHz
+	GPIO_InitStructure.GPIO_PuPd  = GPIO_PuPd_NOPULL;		//没有使用内部上拉电阻
+	GPIO_Init(GPIOB, &GPIO_InitStructure);	
+}
+
+//启动DHT11
+int Dht11_Start(void)
+{
+	u16 timeOut = 0;
+	
+	Dht11_Pin_Mode(GPIO_Mode_OUT);
+	
+	//启动信号
+	GPIO_SetBits(GPIOB,GPIO_Pin_0);
+	delay_ms(1);
+	GPIO_ResetBits(GPIOB,GPIO_Pin_0);
+	delay_ms(20);
+	GPIO_SetBits(GPIOB,GPIO_Pin_0);
+	delay_us(30);
+	// 低电平
+	
+	//配置为输入，判断响应信号是否合理
+	Dht11_Pin_Mode(GPIO_Mode_IN);
+	
+	
+	//等待低电平到来，程序往下运行
+	while( GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_0) == 1 )
+	{
+		
+		timeOut++;
+		delay_us(2);
+		if(timeOut >= 100) //如果等待200us，未有低电平到来，则返回
+		{ 
+			return -2;
+		}
+	}
+	
+	timeOut = 0; // 重新计数
+	//等待高电平到来,过滤低电平
+	while(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_0) == 0)
+	{
+		timeOut++;
+		delay_us(2);
+		//等待时间一定大于80us
+		if(timeOut >= 100) //如果等待200us，未有高电平到来，则返回
+			return -3;	
+	
+	}
+	timeOut = 0; // 重新计数
+	//等待低电平到来，过滤高电平
+	while(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_0) == 1)
+	{
+		timeOut++;
+		delay_us(2);
+		if(timeOut >= 100) //如果等待200us，未有低电平到来，则返回
+			return -4;	
+	}
+	
+	return 0;
+
+}
+
+//接受一个字节
+u8 Dht11_Recv_Byte(void)
+{
+	u16 timeOut ,temp;
+	u8 i, data = 0x00; // 0 0 0 0 0 0 0 0
+	
+	//8位合成一个字节
+	for(i=0; i<8; i++)
+	{
+#if TIM_SEL	
+		timeOut = 0;
+		//等待高电平到来,过滤低电平
+		while(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_0) == 0)
+		{
+			timeOut++;
+			delay_us(2);
+			//等待时间一定大于50us
+			if(timeOut >= 100) //如果等待200us，未有高电平到来，则返回
+				return -5;	
+		
+		}
+#else
+		
+		
+		while(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_0) == 0);
+		
+#endif
+		
+		
+		//设置定时器的CNT为0  
+		TIM3->CNT = 0;
+		//使能定时器开始计数
+		TIM_Cmd(TIM3, ENABLE);
+#if TIM_SEL			
+		
+		timeOut = 0; // 重新计数
+		//等待低电平到来，过滤高电平
+		while(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_0) == 1)
+		{
+			timeOut++;
+			delay_us(2);
+			if(timeOut >= 100) //如果等待200us，未有低电平到来，则返回
+				return -6;	
+		}		
+			
+#else		
+		
+		//粗暴等待低电平到来
+		while(GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_0) == 1);
+#endif
+
+		
+		//temp值高电平持续时间
+		temp = TIM3->CNT;
+
+		//关闭定时器
+		TIM_Cmd(TIM3, DISABLE);
+		
+		//高电平
+		if(temp > 55 && temp <80)
+		{
+			//数据的合成
+			data |= (0x01<<(7-i));
+			
+		}
+		
+	} 
+	return data;
+}
+ 
+
+int Dht11_Date(u8 *data)
+{
+	int i, ret;
+	
+	ret = Dht11_Start();
+	if(ret != 0)
+		return ret;
+	
+	for(i=0; i<5; i++)
+	{
+		data[i] = Dht11_Recv_Byte(); 
+		char tt[5] = {0};
+		sprintf(tt,"%d(%d)",i,data[i]);
+		if(i >= 3)
+			OLED_ShowStr(40*(i - 3), 7, tt, 1); 
+		else
+			OLED_ShowStr(40*i, 6, tt, 1);
+	}
+	
+	//判断采集数据是否正确
+	if(data[4] == data[0]+data[1]+data[2]+data[3])
+		return 1;
+	else if(data[4] == data[0] || data[4] == data[2])
+		return -1;
+	else
+		return 0;
+
+
+}
+
+
+
